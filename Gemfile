@@ -1,9 +1,12 @@
 source 'http://rubygems.org'
-source 'http://rgen-hub.am.freescale.net:9292'
 
-# Specify your gem's dependencies in rgen_debuggers.gemspec
+# Specify your gem's dependencies in origen_debuggers.gemspec
 gemspec
-# JTAG Gem
-gem "rgen_jtag", ">= 0.11.0.pre0"
-# JTAG2IPS Gem
-gem "rgen_jtag2ips", ">= 0.4.1.pre2"
+
+gem 'coveralls', require: false
+
+if RUBY_VERSION >= '2.0.0'
+  gem 'byebug', '~>3.5'
+else
+  gem 'debugger', '~>1.6'
+end

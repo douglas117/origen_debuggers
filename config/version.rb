@@ -1,4 +1,4 @@
-module Debuggers
+module OrigenDebuggers
   MAJOR = 1
   MINOR = 2
   BUGFIX = 0

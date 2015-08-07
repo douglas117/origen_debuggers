@@ -1,3 +1,3 @@
-$dut = Debuggers::Test::DUT.new             # Instantiate an SoC instance
-$tester = Debuggers::PEmicro.new
-RGen.mode = :debug
+$dut = OrigenDebuggers::Test::DUT.new             # Instantiate an SoC instance
+$tester = OrigenDebuggers::PEmicro.new
+Origen.mode = :debug

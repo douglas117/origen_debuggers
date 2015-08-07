@@ -1,4 +1,4 @@
-module Debuggers
+module OrigenDebuggers
   # Driver for the Segger J-Link debugger: http://www.segger.com/debug-probes.html
   #
   # For reference here is the complete command list for this debugger. Note that while
@@ -198,114 +198,110 @@ module Debuggers
   # NOTE: Specifying a filename in command line
   # will start J-Link Commander in script mode.
   class JLink < Base
-
     def initialize
       super
       # The minimum time unit is 1ms
-      set_timeset("default", 1_000_000)
-      @pat_extension = "jlk"
-      @comment_char = "//"
+      set_timeset('default', 1_000_000)
+      @pat_extension = 'jlk'
+      @comment_char = '//'
     end
 
     # All debuggers should try and support these methods
     module Common_API
-
       def delay(cycles)
         dw "Sleep #{cycles_to_ms(cycles)}"
       end
 
-      def write(reg_or_val, options={})
-        self.send("write#{extract_size(reg_or_val, options)}".to_sym, reg_or_val, options)
+      def write(reg_or_val, options = {})
+        send("write#{extract_size(reg_or_val, options)}".to_sym, reg_or_val, options)
       end
-      alias :write_register :write
+      alias_method :write_register, :write
 
-      def read(reg_or_val, options={})
-        self.send("read#{extract_size(reg_or_val, options)}".to_sym, reg_or_val, options)
+      def read(reg_or_val, options = {})
+        send("read#{extract_size(reg_or_val, options)}".to_sym, reg_or_val, options)
       end
-      alias :read_register :read
+      alias_method :read_register, :read
 
       # Read 8 bits of data to the given byte address
-      def read8(data, options={})
-        read_memory(extract_address(data, options), :number_of_bytes => 1)
+      def read8(data, options = {})
+        read_memory(extract_address(data, options), number_of_bytes: 1)
       end
-      alias :read_byte :read8
-      alias :read_8 :read8
+      alias_method :read_byte, :read8
+      alias_method :read_8, :read8
 
       # Read 16 bits of data to the given byte address
-      def read16(data, options={})
-        read_memory(extract_address(data, options), :number_of_bytes => 2)
+      def read16(data, options = {})
+        read_memory(extract_address(data, options), number_of_bytes: 2)
       end
-      alias :read_word :read16
-      alias :read_16 :read16
+      alias_method :read_word, :read16
+      alias_method :read_16, :read16
 
       # Read 32 bits of data to the given byte address
-      def read32(data, options={})
-        read_memory(extract_address(data, options), :number_of_bytes => 4)
+      def read32(data, options = {})
+        read_memory(extract_address(data, options), number_of_bytes: 4)
       end
-      alias :read_longword :read32
-      alias :read_32 :read32
+      alias_method :read_longword, :read32
+      alias_method :read_32, :read32
 
       # Write 8 bits of data to the given byte address
-      def write8(data, options={})
+      def write8(data, options = {})
         dw "w1 0x#{extract_address(data, options).to_s(16).upcase}, 0x#{extract_data(data, options).to_s(16).upcase}"
       end
-      alias :write_byte :write8
-      alias :write_8 :write8
+      alias_method :write_byte, :write8
+      alias_method :write_8, :write8
 
       # Write 16 bits of data to the given byte address
-      def write16(data, options={})
+      def write16(data, options = {})
         dw "w2 0x#{extract_address(data, options).to_s(16).upcase}, 0x#{extract_data(data, options).to_s(16).upcase}"
       end
-      alias :write_word :write16
-      alias :write_16 :write16
+      alias_method :write_word, :write16
+      alias_method :write_16, :write16
 
       # Write 32 bits of data to the given byte address
-      def write32(data, options={})
+      def write32(data, options = {})
         dw "w4 0x#{extract_address(data, options).to_s(16).upcase}, 0x#{extract_data(data, options).to_s(16).upcase}"
       end
-      alias :write_longword :write32
-      alias :write_32 :write32
+      alias_method :write_longword, :write32
+      alias_method :write_32, :write32
 
       # @api private
-      def extract_size(reg_or_val, options={})
+      def extract_size(reg_or_val, options = {})
         size = options[:size] if options[:size]
         unless size
           if reg_or_val.respond_to?(:contains_bits?) && reg_or_val.contains_bits?
-            size = reg_or_val.size 
+            size = reg_or_val.size
           end
         end
-        raise "You must supply an :size option if not providing a register!" unless size
-        unless [8,16,32].include?(size)
-          raise "Only a size of 8, 16 or 32 is supported!"
+        fail 'You must supply an :size option if not providing a register!' unless size
+        unless [8, 16, 32].include?(size)
+          fail 'Only a size of 8, 16 or 32 is supported!'
         end
         size
       end
 
       # @api private
-      def extract_data(reg_or_val, options={})
+      def extract_data(reg_or_val, options = {})
         return options[:data] if options[:data]
         return reg_or_val.data if reg_or_val.respond_to?(:data)
         reg_or_val
       end
 
       # @api private
-      def extract_address(reg_or_val, options={})
+      def extract_address(reg_or_val, options = {})
         addr = options[:addr] || options[:address]
         return addr if addr
         addr = reg_or_val.address if reg_or_val.respond_to?(:address)
-        raise "You must supply an :address option if not providing a register!" unless addr
+        fail 'You must supply an :address option if not providing a register!' unless addr
         addr
       end
-
     end
     include Common_API
 
     # If the debugger supports JTAG definitely add these methods, this provides
     # instant compatibility with any application that uses a JTAG based protocol
     module JTAG_API
-    
       # Write the given value, register or bit collection to the data register
-      def write_dr(reg_or_val, options={})
+      def write_dr(reg_or_val, options = {})
         if reg_or_val.respond_to?(:data)
           data = reg_or_val.data
           size = options[:size] || reg_or_val.size
@@ -320,12 +316,12 @@ module Debuggers
       end
 
       # Read the given value, register or bit collection from the data register
-      def read_dr(reg_or_val, options={})
+      def read_dr(reg_or_val, options = {})
         # Can't read the DR via J-Link
       end
 
       # Write the given value, register or bit collection to the instruction register
-      def write_ir(reg_or_val, options={})
+      def write_ir(reg_or_val, options = {})
         if reg_or_val.respond_to?(:data)
           data = reg_or_val.data
         else
@@ -335,25 +331,21 @@ module Debuggers
       end
 
       # Read the given value, register or bit collection from the instruction register
-      def read_ir(reg_or_val, options={})
+      def read_ir(reg_or_val, options = {})
         # Can't read the IR via J-Link
       end
-
     end
     include JTAG_API
 
     # Other methods can expose unique features of a given debugger
     module Custom
-
-      def read_memory(address, options={})
+      def read_memory(address, options = {})
         options = {
-          :number_of_bytes => 1,
+          number_of_bytes: 1
         }.merge(options)
         dw "mem 0x#{address.to_s(16).upcase}, #{options[:number_of_bytes]}"
       end
-
     end
     include Custom
-
   end
 end

@@ -1,18 +1,22 @@
 // ***************************************************************************
 // GENERATED:
-//   Time:    09-Jul-2014 14:26PM
-//   By:      Callum Sinclair
-//   Command: rgen g jlink_workout -t debug.rb
+//   Time:    07-Aug-2015 08:01AM
+//   By:      Stephen McGinty
+//   Command: origen g jlink_workout -t jlink.rb
 // ***************************************************************************
 // ENVIRONMENT:
 //   Application
-//     Vault:     sync://sync-15088:15088/Projects/common_tester_blocks/rgen_blocks/tester/Debuggers/tool_data/rgen
-//     Version:   v0.0.0.dev0
-//     Workspace: C:/Users/B45845/Desktop/Rgen/debuggers
-//   RGen
-//     Vault:     sync://sync-15088:15088/Projects/common_tester_blocks/rgen
-//     Version:   v2.3.0.dev81
-//     Workspace: C:/rgen
+//     Source:    git@github.com:Origen-SDK/origen_debuggers.git
+//     Version:   1.2.0
+//     Workspace: /proj/mem_c40tfs_testeng/r49409/origen_plugins/origen_debuggers
+//     Branch:    master(1cc6b972197) (+local edits)
+//   Origen
+//     Source:    https://github.com/Origen-SDK/origen
+//     Version:   0.2.2
+//     Workspace: /home/r49409/.origen/gems/ruby/2.1.0/gems/origen-0.2.2
+//   Plugins
+//     origen_doc_helpers:       0.2.0
+//     origen_jtag:              0.12.0
 // ***************************************************************************
 // ######################################################################
 // ## Verify the time base, wait for 10ms which should be 10 sleep cycles
@@ -22,21 +26,11 @@ Sleep 10
 // ######################################################################
 // ## Verify a register API write
 // ######################################################################
-wjc 0x0
-// JTAG2IPS::Driver - Shift address (0x20)
-wjd 0x41, 8
-c
-// JTAG2IPS::Driver - Write data (0x12345678)
-wjd 0x12345678, 32
-c
+// Needs to be enabled when a register protocol is available
 // ######################################################################
 // ## Verify a register API read
 // ######################################################################
-wjc 0x0
-// JTAG2IPS::Driver - Shift address (0x20)
-wjd 0x40, 8
-c
-// JTAG2IPS::Driver - Read data (0x12345678)
+// Needs to be enabled when a register protocol is available
 // ######################################################################
 // ## Verify write_dr with a register
 // ######################################################################

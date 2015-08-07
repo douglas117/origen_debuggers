@@ -1,3 +1,3 @@
-$dut = Debuggers::Test::DUT.new             # Instantiate an SoC instance
-$tester = Debuggers::JLink.new
-RGen.mode = :debug
+$dut = OrigenDebuggers::Test::DUT.new             # Instantiate an SoC instance
+$tester = OrigenDebuggers::JLink.new
+Origen.mode = :debug
