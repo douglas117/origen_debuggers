@@ -1,0 +1,71 @@
+% render "layouts/basic.html" do
+
+%# HTML tags can be embedded in mark down files if you want to do specific custom
+%# formatting like this, but in most cases that is not required.
+<h1><%= RGen.config.name %> <span style="font-size: 14px">(<%= RGen.app.version %>)</span></h1>
+
+### Purpose
+
+This plugin provides tester models to drive bench debuggers such as the Segger J-Link or PE Micro.
+
+### How To Import
+
+##### To use in an application:
+
+Add the following to your application's <code>Gemfile</code>:
+
+~~~ruby
+gem 'rgen_debuggers', '<%= RGen.app.version %>'
+~~~
+
+##### To use in a plugin:
+
+Add the following to your plugin's gemspec:
+
+~~~ruby
+spec.add_runtime_dependency 'rgen_debuggers', '~> <%= RGen.app.version.major %>', '>= <%= RGen.app.version %>'
+~~~
+
+and require the gem in your code:
+
+~~~ruby
+require 'rgen_debuggers'
+~~~
+
+### How To Use
+
+For JTAG based protocols all that should be required is to change the application target
+to instantiate one of the debuggers that support JTAG, such as J-Link or P&E:
+
+~~~ruby
+$tester = Debuggers::JLink.new
+#  or
+#$tester = Debuggers::PEmircro.new
+~~~
+
+Patterns should now generate a debugger command file without any additional application
+modifications.
+
+### How To Setup a Development Environment
+
+~~~
+mkdir <%= RGen.app.config.initials.downcase %>
+cd <%= RGen.app.config.initials.downcase %>
+dssc setvault <%= RGen.app.config.vault %> .
+dssc pop -rec -get .
+~~~
+
+Some patterns can be found in the pattern directory to exercise the debuggers.
+
+Follow the instructions here if you want to make a 3rd party app
+workspace use your development copy of the <%= RGen.app.config.initials %> plugin:
+[Setting up a Plugin Development Environment](http://rgen.freescale.net/rgen/latest/guides/libraries/environment)
+
+This plugin also contains a test suite, make sure this passes before committing
+any changes!
+
+~~~
+rgen examples
+~~~
+
+% end

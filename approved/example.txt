@@ -1,0 +1,53 @@
+RGen can compile any ASCII files within the context of a target, in other words
+you can select a target file and access the objects instantiated in the target
+from here and use them to generate dynamic content.
+
+To try it run the compile task on this file:
+
+> rgen c templates/example.txt.erb
+
+You can also compile entire directories like this:
+
+> rgen c templates
+
+In the case of compiling a directory any .erb files in the directory and its
+subdirectory will be compiled, whereas any non .erb files will simply be
+copied over to the output location un-modified.
+
+See the help for the other available options:
+
+> rgen c -h
+
+SYNTAX
+------
+
+The syntax is very simple:
+
+
+Ruby logic can be used to conditionally include lines:
+  You will see me in the compiled file
+
+Loops can be used to expand the content:
+  I must not talk in class
+  I must not talk in class
+  I must not talk in class
+  I must not talk in class
+  I must not talk in class
+  I must not talk in class
+  I must not talk in class
+  I must not talk in class
+  I must not talk in class
+  I must not talk in class
+
+To inject content use this syntax: 4 + 4 = 8
+
+Whatever is returned by a Ruby snippet like this will be converted to a string and
+output to the compiled file.
+
+That's pretty much it.
+
+Oh almost forgot the best bit, you can access your objects:
+
+"DUT, are you there?"
+
+hello
