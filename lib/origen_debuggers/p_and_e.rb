@@ -269,11 +269,12 @@ module OrigenDebuggers
 
     # Other methods can expose unique features of a given debugger
     module Custom
-      def setPC(address)
+      def set_pc(address)
         dw 'jtag_end' if @in_jtag
         @in_jtag = false
         dw "PC $#{address.to_s(16).upcase}"
       end
+      alias_method :setPC, :set_pc
 
       def go
         dw 'jtag_end' if @in_jtag
