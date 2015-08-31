@@ -1,6 +1,6 @@
 module OrigenDebuggers
-  MAJOR = 1
-  MINOR = 2
+  MAJOR = 0
+  MINOR = 5
   BUGFIX = 0
   DEV = nil
 
