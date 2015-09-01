@@ -1,7 +1,8 @@
+require 'origen_testers'
 module OrigenDebuggers
   # This is base class of all debuggers, any methods/attributes
   # defined here will be available to all
-  class Base < Origen::Tester::CommandBasedTester
+  class Base < OrigenTesters::CommandBasedTester
     # Returns true if the debugger supports JTAG
     def jtag?
       respond_to?(:write_dr)

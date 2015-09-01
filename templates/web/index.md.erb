@@ -46,6 +46,35 @@ $tester = OrigenDebuggers::JLink.new
 Patterns should now generate a debugger command file without any additional application
 modifications.
 
+For non-JTAG-based protocols, all debuggers support a common API for the protocol to
+interface with, for example:
+
+~~~ruby
+# Sleep for 40ms
+$tester.wait(:time_in_ms => 40)
+
+# Sleep for 20 cycles
+$tester.wait(:cycles => 20)
+
+$tester.write_byte(0x55, address: 0x12)
+
+$tester.write_word(0xAA55, address: 0x34)
+
+$tester.write_longword(0x1122_AA55, address: 0x5678)
+
+$tester.read(10, address: 0x0001234, size: 8)
+~~~
+
+See the API for details on all available methods: [Common_API](<%= path "api/OrigenDebuggers/JLink/Common_API.html" %>)
+
+Finally all debuggers support a direct write method that should be used as a last resort
+to drive debugger-specific functionality that is not otherwise exposed via an official API:
+
+~~~ruby
+$tester.dw "hwinfo"
+$tester.dw "mem 0x1234, 10"
+~~~
+
 ### How To Setup a Development Environment
 
 [Clone the repository from Github](https://github.com/Origen-SDK/origen_debuggers).
