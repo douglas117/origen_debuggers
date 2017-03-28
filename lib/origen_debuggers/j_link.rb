@@ -346,18 +346,18 @@ module OrigenDebuggers
         value = interface == :swd ? 1 : 0   # set interface : JTAG=0, SWD=1
         dw "si #{value}"
         # pull a reset now
-        dw "RSetType 2" # reset via reset pin which should be same as manual reset pin
-                        # toggle.  Also forces CPU to halt when it comes out of reset
-        dw "r"          # reset and halts the device (prob not needed)
-        dw "halt"       # halt core just in case
+        dw 'RSetType 2' # reset via reset pin which should be same as manual reset pin
+        # toggle.  Also forces CPU to halt when it comes out of reset
+        dw 'r'          # reset and halts the device (prob not needed)
+        dw 'halt'       # halt core just in case
       end
 
       def halt
-        dw "halt"
+        dw 'halt'
       end
 
       def quit
-        dw "q"
+        dw 'q'
       end
 
       def read_memory(address, options = {})
@@ -366,7 +366,6 @@ module OrigenDebuggers
         }.merge(options)
         dw "mem 0x#{address.to_s(16).upcase}, #{options[:number_of_bytes]}"
       end
-
     end
     include Custom
   end
