@@ -34,6 +34,17 @@ ss "Verify write16"
 $tester.write16 0x55AA, :address => 0x12
 ss "Verify write32" 
 $tester.write32 0x55AA_3344, :address => 0x12
+
+ss "Verify read8"
+$tester.read8 0x55, :address => 0x12
+ss "Verify read16"
+$tester.read16 0x55AA, :address => 0x12
+ss "Verify read32"
+$tester.read32 0x55AA_3344, :address => 0x12
+
+ss "Verify read32data"
+$tester.read32data 0xFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF, :address => 0x12, :number => 4
+
 ss "Verify write with a register" 
 $tester.write $dut.reg(:reg32)
 ss "Verify write with a data value" 
@@ -42,3 +53,7 @@ ss "Verify read with a register"
 $tester.read $dut.reg(:reg32)
 ss "Verify read with a data value" 
 $tester.read 0x55, :address => 0x12, :size => 8
+
+
+ss "Verify delay of 10k mS"
+$tester.delay(10000)

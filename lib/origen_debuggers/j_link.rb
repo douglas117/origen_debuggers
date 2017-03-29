@@ -245,6 +245,11 @@ module OrigenDebuggers
       alias_method :read_longword, :read32
       alias_method :read_32, :read32
 
+      # Read 32-bit chunks of data using given byte address
+      def read32data(data, options = {})
+        read_memory(extract_address(data, options), type: :_32, number: options[:number])
+      end
+
       # Write 8 bits of data to the given byte address
       def write8(data, options = {})
         dw "w1 0x#{extract_address(data, options).to_s(16).upcase}, 0x#{extract_data(data, options).to_s(16).upcase}"
@@ -362,9 +367,22 @@ module OrigenDebuggers
 
       def read_memory(address, options = {})
         options = {
-          number_of_bytes: 1
+          number: 1,    # number of items to read
+          type:   :byte           # type of data to be read
         }.merge(options)
-        dw "mem 0x#{address.to_s(16).upcase}, #{options[:number_of_bytes]}"
+
+        # for backward compatibility
+        options[:number] = options[:number_of_bytes] if options[:number_of_bytes]
+
+        if options[:type] == :_32
+          dw "mem32 0x#{address.to_s(16).upcase}, #{options[:number].to_hex}"
+        elsif options[:type] == :_16
+          dw "mem16 0x#{address.to_s(16).upcase}, #{options[:number].to_hex}"
+        elsif options[:type] == :_8
+          dw "mem8 0x#{address.to_s(16).upcase}, #{options[:number].to_hex}"
+        else
+          dw "mem 0x#{address.to_s(16).upcase}, #{options[:number].to_hex}"
+        end
       end
     end
     include Custom
