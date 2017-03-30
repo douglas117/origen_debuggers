@@ -226,21 +226,47 @@ module OrigenDebuggers
 
       # Read 8 bits of data to the given byte address
       def read8(data, options = {})
-        read_memory(extract_address(data, options), number_of_bytes: 1)
+        read_memory(extract_address(data, options), number: 1)
       end
       alias_method :read_byte, :read8
       alias_method :read_8, :read8
 
       # Read 16 bits of data to the given byte address
       def read16(data, options = {})
-        read_memory(extract_address(data, options), number_of_bytes: 2)
+        read_memory(extract_address(data, options), number: 2)
       end
       alias_method :read_word, :read16
       alias_method :read_16, :read16
 
       # Read 32 bits of data to the given byte address
+      #
+      # data can be array of registers, if array of data then will auto-incrememnt address
       def read32(data, options = {})
-        read_memory(extract_address(data, options), number_of_bytes: 4)
+        options = { optimize: false,   # whether to use a single command to do the read
+                    # user may care regarding endianness
+                    size:     32,        # size of each item in bits
+                    number:   1,        # default number of items
+        }.merge(options)
+        options[:optimize] = options[:optimized] if options[:optimized]
+
+        if data.is_a?(Array)
+          if options[:optimize]
+            # for optimized option assume single starting address for data in array
+            read_memory(extract_address(data, options), size: options[:size], number: data.length)
+          else
+            data.each_index do |i|
+              data_item = data[i]
+              # do separate writes for each 32-bit word
+              read_memory(extract_address(data_item, options) + i * (options[:size] / 8), size: options[:size])
+            end
+          end
+        else
+          if options[:optimize]
+            read_memory(extract_address(data, options), size: options[:size], number: options[:number])
+          else
+            read_memory(extract_address(data, options), number: (options[:size] / 8))
+          end
+        end
       end
       alias_method :read_longword, :read32
       alias_method :read_32, :read32
@@ -341,11 +367,41 @@ module OrigenDebuggers
 
     # Other methods can expose unique features of a given debugger
     module Custom
+      def set_interface(interface)
+        # set interface and reset
+        value = interface == :swd ? 1 : 0   # set interface : JTAG=0, SWD=1
+        dw "si #{value}"
+        # pull a reset now
+        dw 'RSetType 2' # reset via reset pin which should be same as manual reset pin
+        # toggle.  Also forces CPU to halt when it comes out of reset
+        dw 'r'          # reset and halts the device (prob not needed)
+        dw 'halt'       # halt core just in case
+      end
+
+      def halt
+        dw 'halt'
+      end
+
+      def quit
+        dw 'q'
+      end
+
       def read_memory(address, options = {})
         options = {
-          number_of_bytes: 1
+          number: 1,    # number of items to read
+          size:   8     # number of bits in each item
         }.merge(options)
-        dw "mem 0x#{address.to_s(16).upcase}, #{options[:number_of_bytes]}"
+
+        if options[:size] == 32
+          dw "mem32 0x#{address.to_s(16).upcase}, #{options[:number].to_hex}"
+        elsif options[:size] == 16
+          dw "mem16 0x#{address.to_s(16).upcase}, #{options[:number].to_hex}"
+        elsif options[:size] == 8
+          dw "mem 0x#{address.to_s(16).upcase}, #{options[:number].to_hex}"
+          # not sure difference between mem and mem8
+        else
+          fail 'You must supply a valid :size option!'
+        end
       end
     end
     include Custom
