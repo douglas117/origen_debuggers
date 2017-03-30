@@ -1,3 +1,14 @@
+<a class="anchor release_tag" name="v0_5_2"></a>
+<h1><a href="#v0_5_2">Tag: v0.5.2</a></h1>
+
+##### Branch: 'master'
+
+##### by Daniel Hadad on 30-Mar-2017 09:47AM
+
+
+Additional command supported added. Added method to permit change of interface type
+between SWD and JTAG.
+
 <a class="anchor release_tag" name="v0_5_1"></a>
 <h1><a href="#v0_5_1">Tag: v0.5.1</a></h1>
 
