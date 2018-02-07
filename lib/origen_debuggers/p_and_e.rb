@@ -108,8 +108,7 @@ module OrigenDebuggers
   # ----------------------
 
   class PEmicro < Base
-    def initialize
-      super
+    def on_create
       set_timeset('default', 1_000_000)
       @pat_extension = 'mac'
       @comment_char = ';'

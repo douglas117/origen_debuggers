@@ -200,8 +200,7 @@ module OrigenDebuggers
   # NOTE: Specifying a filename in command line
   # will start J-Link Commander in script mode.
   class JLink < Base
-    def initialize
-      super
+    def on_create
       # The minimum time unit is 1ms
       set_timeset('default', 1_000_000)
       @pat_extension = 'jlk'
