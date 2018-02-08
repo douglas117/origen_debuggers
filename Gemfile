@@ -5,3 +5,4 @@ gemspec
 
 gem 'byebug', '<9'
 gem 'origen_updater'
+gem 'origen', path: '/home/nxa21353/Code/github/origen'

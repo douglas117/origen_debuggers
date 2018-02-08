@@ -3,8 +3,7 @@ module OrigenDebuggers
     # A simple DUT model used to test the debuggers
     class DUT
       include OrigenJTAG
-      include Origen::Pins
-      include Origen::Registers
+      include Origen::TopLevel
 
       def initialize
         add_pin :tclk
