@@ -126,6 +126,9 @@ module OrigenDebuggers
       def write(reg_or_val, options = {})
         dw 'jtag_end' if @in_jtag
         @in_jtag = false
+        if reg_or_val.respond_to?(:data)
+          cc("[P&E] Write #{reg_or_val.name.upcase} register, address: 0x%06X with value: 0x%08X" % [reg_or_val.address, reg_or_val.data])
+        end
         send("write#{extract_size(reg_or_val, options)}".to_sym, reg_or_val, options)
       end
       alias_method :write_register, :write
@@ -133,6 +136,9 @@ module OrigenDebuggers
       def read(reg_or_val, options = {})
         dw 'jtag_end' if @in_jtag
         @in_jtag = false
+        if reg_or_val.respond_to?(:data)
+          cc("[P&E] Read #{reg_or_val.name.upcase} register, address: 0x%06X, expect value: 0x%08X" % [reg_or_val.address, reg_or_val.data])
+        end
         send("read#{extract_size(reg_or_val, options)}".to_sym, reg_or_val, options)
       end
       alias_method :read_register, :read
