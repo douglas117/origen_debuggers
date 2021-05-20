@@ -1,11 +1,20 @@
 module OrigenDebuggers
   
   class OpenOCD < OrigenTesters::CommandBasedTester
-    def on_create
+    # def on_create
+      # The minimum time unit is 1ms
+    #  set_timeset('default', 1_000_000)
+    #  @pat_extension = 'tcl'
+    #  @comment_char = '   # ' 
+    #  super
+    # end
+
+    def initialize
       # The minimum time unit is 1ms
       set_timeset('default', 1_000_000)
       @pat_extension = 'tcl'
-      @comment_char = '   # '
+      @comment_char = '   # ' 
+      super
     end
 
     # All debuggers should try and support these methods
@@ -16,20 +25,26 @@ module OrigenDebuggers
 
       def write(reg_or_val, options = {})
         if reg_or_val.respond_to?(:data)
-          debugger
-          cc("[OpenOCD] Write #{reg_or_val.name.upcase} register, address: 0x%06X with value: 0x%08X" % [reg_or_val.address, reg_or_val.data])
+            cc("[OpenOCD] Write #{reg_or_val.owner.name.upcase} reg: #{reg_or_val.name.upcase} register, address: 0x%06X with value: 0x%08X" % [reg_or_val.address, reg_or_val.data])
         end
-        write_dr(reg_or_val, options)
+        if options[:jtag] == true
+          # Use write IR and write DR
+          write_ir(reg_or_val, options)
+          write_dr(reg_or_val, options)
+        else
+          # Try to use the writeX functions...
+          send("write#{extract_size(reg_or_val, options)}".to_sym, reg_or_val, options)
+        end
       end
-      alias_method :write_register, :write
+      
 
       def read(reg_or_val, options = {})
         if reg_or_val.respond_to?(:data)
-          cc("[JLink] Read #{reg_or_val.name.upcase} register, address: 0x%06X, expect value: 0x%08X" % [reg_or_val.address, reg_or_val.data])
+          cc("[OpenOCD] Read #{reg_or_val.name.upcase} register, address: 0x%06X, expect value: 0x%08X" % [reg_or_val.address, reg_or_val.data])
         end
         send("read#{extract_size(reg_or_val, options)}".to_sym, reg_or_val, options)
       end
-      alias_method :read_register, :read
+      
 
       # Read 8 bits of data to the given byte address
       def read8(data, options = {})
@@ -136,12 +151,18 @@ module OrigenDebuggers
       def write_dr(reg_or_val, options = {})
         if reg_or_val.respond_to?(:data)
           data = reg_or_val.data
-          size = options[:size] || reg_or_val.size
+          size = reg_or_val.size
         else
           data = reg_or_val
           size = options[:size]
         end
-        dw "drscan tsmc_tap_controller.cpu #{size} 0x#{data.to_s(16).upcase}\n"  # the extra clock cycle is needed here to opperate correctly on certain devices
+        data_size = "0x#{size.to_s(16)}"
+        data_in = "#{data.to_s(16)}"
+        
+        for i in 1..(10 - data_in.size) #10 digits max...
+          data_in = "0" + data_in
+        end
+        dw "drscan tsmc_tap_controller.cpu #{data_size.to_s + " 0x" + data_in.to_s}\n" 
         # the added clock cycle means that the JLink opperation matches the atp tester opperation (J750 etc)
         # some devices may function without the addition, however an extra clock cycle in "run-Test/idle" is unlikely to
         # break anything so has been added universally.
@@ -154,10 +175,13 @@ module OrigenDebuggers
 
       # Write the given value, register or bit collection to the instruction register
       def write_ir(reg_or_val, options = {})
-        if reg_or_val.respond_to?(:data)
-          data = reg_or_val.data
+        if reg_or_val.respond_to?(:offset)
+          data = reg_or_val.offset
         else
           data = reg_or_val
+        end
+        if options[:irscan_precode] == true
+          data = (data << 2) | 0b10
         end
         dw "irscan tsmc_tap_controller.cpu 0x#{data.to_s(16).upcase}"
       end
