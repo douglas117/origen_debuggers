@@ -156,8 +156,8 @@ module OrigenDebuggers
           data = reg_or_val
           size = options[:size]
         end
-        data_size = "0x#{size.to_s(16)}"
-        data_in = "#{data.to_s(16)}"
+        data_size = "0x#{size.to_i.to_s(16)}"
+        data_in = "#{data.to_i.to_s(16)}"
         
         for i in 1..(10 - data_in.size) #10 digits max...
           data_in = "0" + data_in
